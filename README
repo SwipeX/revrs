@@ -1,0 +1,36 @@
+This is a tool with the central purpose of debugging and exploring the loaded classes in a JVM. 
+
+The intention of this code is to be open source. The point is to learn more about reverse engineering.
+
+The intended feature set includes:
+
+* Hierarchy Tree View
+    * Editable (Insert/Remove/Move) 
+
+* Real Time Value Debugging
+    * Value watches
+    * Threshold values (alert)
+    * On screen debugging allowed
+
+* Object Explorer
+    * Stems from RTD
+    * Explores any non-array object
+    * No limit on depth
+
+* Array Explorer (for any size dimension)
+    * Provides RTD access to object explorer for arrays
+    * Should be able to filter subsets in array
+
+* Member Identification Utility
+    * Easy to use / clean framework
+    * Standard format (I/O both) [CSV likely]
+    * Work in-line with RTD for debugging (refactor)
+    * Output Support
+
+* Real Time Injection (note: able to be hot-swapped with changes)
+    * For use in conjunction with MIU
+    * Keep initial classes, hot-swap when needed
+
+* Member Transform Support
+    * Would be for callback / deob
+    * Not essential for the initial purpose
