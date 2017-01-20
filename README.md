@@ -41,6 +41,9 @@ Things revrs is *NOT*:
    * An IDE.  While it will support MIU, it will not provide a means to do so, you can code in your IDE of choice and point to the files.
    * A substitute for an updater. revrs will assist you in locating necessary hooks and values, however, you must do the work and maintain updates.
    * A teacher. You will still need to gain knowledge and learn on your own or from another person, this is not an instructional teaching software.
+   
+Uses a condensed version of ASM5 adapted by myself and @tsedlar.
+https://github.com/SwipeX/ASM-5-Condensed
         
     
 
