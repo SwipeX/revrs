@@ -28,7 +28,7 @@ The intended feature (In order of importance) set includes:
     * Output Support
 
 * Real Time Injection (note: able to be hot-swapped with changes)
-    * For use in conjunction with MIU
+    * For use in conjunction with MIU 
     * Keep initial classes, hot-swap when needed
     _There are really two options for this. One is to restart the jar after re-injecting, so reflection may be the most beneficial here. However, http://hotswapagent.org/ could also be used as it allows for you to specify a custom vm that allows for full class structure swapping. This will not be considered a priority atm._
 

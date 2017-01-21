@@ -1,6 +1,7 @@
 package com.rsh;
 
 import javax.swing.*;
+import java.util.HashMap;
 
 /**
  * Created by TimD on 1/20/2017.
@@ -14,6 +15,8 @@ public class Application {
         JFrame frame = getFrame();
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
+        JMenuBar menuBar = new JMenuBar();
+        JMenuItem file = new JMenuItem("File");
     }
 
     public static JFrame getFrame() {
