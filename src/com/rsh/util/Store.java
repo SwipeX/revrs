@@ -24,6 +24,11 @@ public class Store {
     private static final String DEOB_DIR = JAR_DIR + File.separator + "deob";
     private static final String[] DIRECTORIES = new String[]{HOME_DIR, MIU_DIR, JAR_DIR, DEOB_DIR};
     private static int lastVersion = -1;
+    private static Crawler crawler = new Crawler();
+
+    public static Crawler getCrawler() {
+        return crawler;
+    }
 
     public static int getLastVersion() {
         return lastVersion;
@@ -39,7 +44,7 @@ public class Store {
 
     public static void loadClasses(String filename) {
         try {
-            loadClasses(new JarFile(filename));
+            loadClasses(new JarFile(filename, false));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,15 +69,19 @@ public class Store {
 
 
     public static void updateJar() {
-        try {
-            Crawler crawler = new Crawler();
-            if (crawler.outdated()) {
-                crawler.download();
+        new Thread(() -> {
+            try {
+                if (crawler.outdated()) {
+                    crawler.download();
+                    Application.infoBox("Jar updated!", "Done");
+                    loadClasses(HOME_DIR + File.separator + "os_pack.jar");
+                } else {
+                    Application.infoBox("Already up to date!", "Connection");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            JarFile file = new JarFile(new File(HOME_DIR + File.separator + "os_pack.jar"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        }).start();
     }
 
     public static String getHomeDirectory() {

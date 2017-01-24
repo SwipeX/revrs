@@ -30,6 +30,10 @@ public class Archive {
             ArrayList<JarEntry> entries = Collections.list(file.entries());
             ConcurrentHashMap<String, InputStream> entryStreams = new ConcurrentHashMap<>(entries.size());
             for (JarEntry entry : entries) {
+                if(entry.getName().startsWith("META-INF")){
+                    System.out.println(entry.getName());
+                    continue;
+                }
                 entryStreams.put(entry.getName(), file.getInputStream(entry));
             }
             entryStreams.forEach(4, (name, input) -> {
@@ -87,11 +91,11 @@ public class Archive {
                 output.write(writer.toByteArray());
                 output.closeEntry();
             }
-//            for (Map.Entry<String, byte[]> entry : resources.entrySet()) {
-//                output.putNextEntry(new JarEntry(entry.getKey()));
-//                output.write(entry.getValue());
-//                output.closeEntry();
-//            }
+            for (Map.Entry<String, byte[]> entry : resources.entrySet()) {
+                output.putNextEntry(new JarEntry(entry.getKey()));
+                output.write(entry.getValue());
+                output.closeEntry();
+            }
             output.flush();
         } catch (Exception e) {
             e.printStackTrace();

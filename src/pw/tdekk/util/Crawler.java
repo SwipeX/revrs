@@ -10,7 +10,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
 public class Crawler {
 
@@ -30,24 +32,28 @@ public class Crawler {
     public Crawler() {
         System.setProperty("http.agent", "Mozilla/5.0 (Windows NT 5.1; rv:19.0) Gecko/20100101 Firefox/19.0");
         this.home = "http://oldschool" +
-               WORLDS[(int) (Math.random() * WORLDS.length)] + ".runescape.com/";
+                WORLDS[(int) (Math.random() * WORLDS.length)] + ".runescape.com/";
         this.config = home + "jav_config.ws";
         crawl();
     }
 
     private int getLocalHash() {
-        try {
-            URL url = new File(pack).toURI().toURL();
-            try (JarInputStream stream = new JarInputStream(url.openStream())) {
-                return stream.getManifest().hashCode();
-            } catch (Exception e) {
-                return -1;
-            }
-        } catch (MalformedURLException e) {
-            return -1;
-        }
+        return getJarHash(pack);
     }
 
+    private int getJarHash(String path) {
+       return getJarHash(new File(path));
+    }
+
+    private int getJarHash(File file) {
+        try {
+            JarFile jarFile = new JarFile(file);
+            return jarFile.getManifest().hashCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 
     private int getRemoteHash() {
         try {
@@ -63,14 +69,14 @@ public class Crawler {
     }
 
     public boolean outdated() {
-        File gamepack = new File(pack);
-        if (!gamepack.exists()) {
-            return true;
+        int remoteHash = getRemoteHash();
+        for (File file : new File(Store.getJarDirectory()).listFiles()) {
+            if(file == null || file.isDirectory())continue;
+            int hash = getJarHash(file);
+            System.out.println(hash + " " + remoteHash);
+            if (remoteHash == hash) return false;
         }
-        if (hash == -1) {
-            hash = getLocalHash();
-        }
-        return hash == -1 || hash != getRemoteHash();
+        return true;
     }
 
     private boolean crawl() {
