@@ -89,6 +89,8 @@ public class Application {
             if (result == WebOptionPane.YES_OPTION) {
                 Store.updateJar();
             }
+        }else{
+            Store.loadClasses(Store.getHighestRevision().getPath());
         }
     }
 

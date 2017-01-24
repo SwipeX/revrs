@@ -50,6 +50,23 @@ public class Store {
         }
     }
 
+    public static File getHighestRevision() {
+        int highest = 0;
+        File jar = null;
+        for (File file : new File(JAR_DIR).listFiles()) {
+            if (file.isDirectory()) continue;
+            String name = file.getName();
+            if (name.endsWith(".jar")) {
+                int revision = Integer.parseInt(name.replace(".jar", ""));
+                if (revision > highest) {
+                    jar = file;
+                    highest = revision;
+                }
+            }
+        }
+        return jar;
+    }
+
     public static void loadClasses(JarFile file) {
         try {
             classes = Archive.build(file);
