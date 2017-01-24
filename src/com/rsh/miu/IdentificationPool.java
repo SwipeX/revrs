@@ -1,7 +1,10 @@
 package com.rsh.miu;
 
-import java.util.Collection;
-import java.util.HashMap;
+import com.rsh.util.Store;
+import org.objectweb.asm.tree.ClassNode;
+
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -10,8 +13,7 @@ import java.util.stream.Collectors;
 public class IdentificationPool {
     private HashMap<String, MemberIdentity> identityMap = new HashMap<>();
 
-    //TODO figure out wtf im doing wrong lmao
-    public Collection<? extends MemberIdentity> getByType(Class identityClass){
-        return identityMap.values().stream().collect(Collectors.toCollection(id -> identityClass.equals(id.getClass())));
+    private List<MemberIdentity> getByType(Class<?> cType) {
+        return identityMap.values().stream().filter(i -> i.getClass().equals(cType)).collect(Collectors.toCollection(ArrayList::new));
     }
 }

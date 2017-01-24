@@ -1,5 +1,7 @@
 package pw.tdekk.deob.usage;
 
+import com.rsh.Application;
+import com.rsh.util.Store;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.*;
@@ -33,8 +35,8 @@ public class UnusedMembers implements Mutator {
 
     @Override
     public void mutate() {
-        for (ClassNode node : Application.getClasses().values()) {
-            if (Application.getClasses().values().stream().filter(c -> c.superName.equals(node.name)).count() == 0) {
+        for (ClassNode node : Store.getClasses().values()) {
+            if (Store.getClasses().values().stream().filter(c -> c.superName.equals(node.name)).count() == 0) {
                 ClassHierarchy hierarchy = new ClassHierarchy(node);
                 addHierarchy(node, hierarchy);
                 hierarchy.getHierarchy().forEach(classNode -> addHierarchy(classNode, hierarchy));
@@ -44,7 +46,7 @@ public class UnusedMembers implements Mutator {
         getEntryPoints().forEach(this::visit);
 
         ArrayList<MethodNode> toRemove = new ArrayList<>();
-        Application.getClasses().values().forEach(c ->
+        Store.getClasses().values().forEach(c ->
                 c.methods.forEach(m -> {
                     if (!usedMethods.contains(m.getHandle())) {
                         toRemove.add(m);
@@ -52,7 +54,7 @@ public class UnusedMembers implements Mutator {
                     }
                 }));
         toRemove.forEach(m -> m.owner.methods.remove(m));
-        System.out.println(String.format("Removed %s methods in %s ms", removedCount, (System.currentTimeMillis() - startTime)));
+        Application.infoBox(String.format("Removed %s methods in %s ms", removedCount, (System.currentTimeMillis() - startTime)), "Status");
     }
 
     private void addHierarchy(ClassNode node, ClassHierarchy hierarchy) {
@@ -69,8 +71,8 @@ public class UnusedMembers implements Mutator {
         mn.accept(new MethodVisitor() {
             @Override
             public void visitMethodInsn(MethodInsnNode mn) {
-                if (Application.getClasses().containsKey(mn.owner)) {
-                    ClassNode node = Application.getClasses().get(mn.owner);
+                if (Store.getClasses().containsKey(mn.owner)) {
+                    ClassNode node = Store.getClasses().get(mn.owner);
                     MethodNode method = node.getMethod(mn.name, mn.desc);
                     if (method != null) {
                         visit(method);
@@ -87,21 +89,21 @@ public class UnusedMembers implements Mutator {
 
     public List<MethodNode> getEntryPoints() {
         ArrayList<MethodNode> entry = new ArrayList<>();
-        Application.getClasses().values().forEach(node -> {
+        Store.getClasses().values().forEach(node -> {
             //All methods > 2 length for osrs obfuscator
             entry.addAll(node.methods.stream().filter(m -> m.name.length() > 2).collect(Collectors.toList()));
             //Any subclass methods should be added
             String superName = node.superName;
-            if (Application.getClasses().containsKey(superName)) {
+            if (Store.getClasses().containsKey(superName)) {
                 for (MethodNode method : node.methods) {
-                    entry.addAll(Application.getClasses().get(superName).methods.stream().filter(m ->
+                    entry.addAll(Store.getClasses().get(superName).methods.stream().filter(m ->
                             m.name.equals(method.name) && m.desc.equals(method.desc)).collect(Collectors.toList()));
                 }
             }
             //interface methods
             List<String> interfaces = node.interfaces;
             for (String iface : interfaces) {
-                ClassNode impl = Application.getClasses().get(iface);
+                ClassNode impl = Store.getClasses().get(iface);
                 if (impl != null) {
                     for (MethodNode mn : node.methods) {
                         impl.methods.stream().filter(imn -> mn.name.equals(imn.name) && mn.desc.equals(imn.desc)).forEach(imn -> {

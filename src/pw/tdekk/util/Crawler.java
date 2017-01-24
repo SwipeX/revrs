@@ -1,5 +1,7 @@
 package pw.tdekk.util;
 
+import com.rsh.util.Store;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +23,7 @@ public class Crawler {
 
     private final String home;
     private final String config;
-    private final String pack;
+    private final String pack = Store.getHomeDirectory() + File.separator + "os_pack.jar";
 
     private int hash = -1;
 
@@ -30,7 +32,6 @@ public class Crawler {
         this.home = "http://oldschool" +
                WORLDS[(int) (Math.random() * WORLDS.length)] + ".runescape.com/";
         this.config = home + "jav_config.ws";
-        this.pack = "os_pack.jar";
         crawl();
     }
 

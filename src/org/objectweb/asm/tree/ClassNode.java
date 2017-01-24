@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.rsh.util.Store;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
@@ -473,7 +474,7 @@ public class ClassNode extends ClassVisitor {
                 return mn;
             }
         }
-        return ownerless() ? null : Application.getClasses().get(superName).getMethod(method, desc);
+        return ownerless() ? null : Store.getClasses().get(superName).getMethod(method, desc);
     }
 
     public MethodNode getMethod(String desc) {

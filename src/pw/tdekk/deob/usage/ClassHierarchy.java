@@ -1,5 +1,6 @@
 package pw.tdekk.deob.usage;
 
+import com.rsh.util.Store;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -66,8 +67,8 @@ public class ClassHierarchy {
      * @return a list of the ClassNodes for these interfaces if they exist.
      */
     private final List<ClassNode> getInterfaces(List<String> interfaces) {
-        return interfaces.stream().filter(i -> Application.getClasses().containsKey(i)).map(i ->
-                Application.getClasses().get(i)).collect(Collectors.toCollection(ArrayList::new));
+        return interfaces.stream().filter(i -> Store.getClasses().containsKey(i)).map(i ->
+                Store.getClasses().get(i)).collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -86,8 +87,8 @@ public class ClassHierarchy {
      */
     public final ClassNode getSuperClass(ClassNode node) {
         String parentName = node.superName;
-        if (Application.getClasses().containsKey(parentName)) {
-            return Application.getClasses().get(parentName);
+        if (Store.getClasses().containsKey(parentName)) {
+            return Store.getClasses().get(parentName);
         }
         return null;
     }

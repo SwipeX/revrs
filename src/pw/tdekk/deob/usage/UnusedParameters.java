@@ -1,5 +1,6 @@
 package pw.tdekk.deob.usage;
 
+import com.rsh.util.Store;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -18,7 +19,7 @@ public class UnusedParameters implements Mutator {
 
     @Override
     public void mutate() {
-        for (ClassNode node : Application.getClasses().values()) {
+        for (ClassNode node : Store.getClasses().values()) {
             for (MethodNode mn : node.methods) {
                 int offset = (mn.access & Opcodes.ACC_STATIC) != 0 ? 0 : 1;
                 Type[] types = Type.getArgumentTypes(mn.desc);

@@ -10,7 +10,7 @@ public abstract class MemberIdentity {
     private String name;
     private String identity;
 
-    public boolean IsIdentified() {
+    public boolean isIdentified() {
         return identity != null;
     }
 
