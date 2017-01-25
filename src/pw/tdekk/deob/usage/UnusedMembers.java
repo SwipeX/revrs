@@ -39,7 +39,7 @@ public class UnusedMembers implements Mutator {
             if (Store.getClasses().values().stream().filter(c -> c.superName.equals(node.name)).count() == 0) {
                 ClassHierarchy hierarchy = new ClassHierarchy(node);
                 addHierarchy(node, hierarchy);
-                hierarchy.getHierarchy().forEach(classNode -> addHierarchy(classNode, hierarchy));
+                hierarchy.asList().forEach(classNode -> addHierarchy(classNode, hierarchy));
             }
         }
         long startTime = System.currentTimeMillis();

@@ -38,7 +38,7 @@ public class ClassHierarchy {
     /**
      * @return the classes in the hierarchy, not containing the root.
      */
-    public List<ClassNode> getHierarchy() {
+    public List<ClassNode> asList() {
         return hierarchy;
     }
 

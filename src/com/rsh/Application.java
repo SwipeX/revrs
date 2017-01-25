@@ -1,22 +1,32 @@
 package com.rsh;
 
+import com.alee.extended.tree.WebAsyncTree;
+import com.alee.extended.tree.WebFileTree;
 import com.alee.laf.WebLookAndFeel;
+import com.alee.laf.desktoppane.WebDesktopPaneUI;
 import com.alee.laf.filechooser.WebFileChooser;
 import com.alee.laf.optionpane.WebOptionPane;
 import com.alee.laf.rootpane.WebFrame;
+import com.alee.laf.scroll.WebScrollPane;
+import com.alee.laf.scroll.WebScrollPaneUI;
+import com.alee.laf.tree.WebTreeUI;
+import com.rsh.tree.ASyncNodeProvider;
+import com.rsh.tree.PositionNode;
+import com.rsh.tree.PositionNodeRenderer;
 import com.rsh.util.Store;
+import javafx.geometry.Pos;
 import pw.tdekk.deob.usage.UnusedMembers;
 import pw.tdekk.util.Archive;
-import pw.tdekk.util.Crawler;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
  * Created by TimD on 1/20/2017.
- * Probably should try not to have such a clutter in main...
  */
 public class Application {
 
@@ -32,11 +42,28 @@ public class Application {
 
         WebFrame frame = (WebFrame) getFrame();
         frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
+        addMenuItems(frame);
+        frame.setVisible(true);
+        if (Store.getCrawler().outdated()) {
+            int result = WebOptionPane.showConfirmDialog(frame, "Would you like to update", "Outdated!", WebOptionPane.YES_NO_OPTION);
+            if (result == WebOptionPane.YES_OPTION) {
+                Store.updateJar();
+            }
+        } else {
+            Store.loadClasses(Store.getHighestRevision().getPath());
+        }
+    }
+
+    private static void addMenuItems(JFrame frame) {
         JMenuBar menuBar = new JMenuBar();
+
         JMenu file = new JMenu("File");
         menuBar.add(file);
+
+        JMenuItem view = new JMenu("View");
+        menuBar.add(view);
 
         JMenuItem load = new JMenuItem("Load");
         load.addActionListener(e -> {
@@ -79,19 +106,29 @@ public class Application {
         file.add(deob);
 
         JMenuItem exit = new JMenuItem("Exit");
+        exit.addActionListener(e -> System.exit(1));
         file.add(exit);
+
+        JMenuItem hierarchy = new JMenuItem("Class Hierarchy");
+        hierarchy.addActionListener(e -> {
+            //tree class diagram
+            // Create data provider
+            ASyncNodeProvider dataProvider = new ASyncNodeProvider();
+
+            // Create a tree based on your data provider
+            WebAsyncTree<PositionNode> asyncTree = new WebAsyncTree<>(dataProvider);
+            asyncTree.setVisibleRowCount(8);
+            asyncTree.setEditable(true);
+            asyncTree.setCellRenderer(new PositionNodeRenderer());
+
+            // Show an example frame
+            frame.getContentPane().add(new WebScrollPane(asyncTree));
+            frame.setVisible(true);
+        });
+        view.add(hierarchy);
+
         frame.setLayout(new BorderLayout());
         frame.add(menuBar, BorderLayout.NORTH);
-        frame.setVisible(true);
-
-        if (Store.getCrawler().outdated()) {
-            int result = WebOptionPane.showConfirmDialog(frame, "Would you like to update", "Outdated!", WebOptionPane.YES_NO_OPTION);
-            if (result == WebOptionPane.YES_OPTION) {
-                Store.updateJar();
-            }
-        }else{
-            Store.loadClasses(Store.getHighestRevision().getPath());
-        }
     }
 
     public static void infoBox(String infoMessage, String titleBar) {
