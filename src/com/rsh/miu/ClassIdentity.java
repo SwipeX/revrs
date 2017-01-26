@@ -77,25 +77,19 @@ public class ClassIdentity extends MemberIdentity {
     /**
      * @param node a ClassNode object to check against
      * @return true if the node scores a perfect score.
-     * <p>
-     * Honestly this is fine, but it has repetitive code and probably could get better.
+     *
      */
     public boolean matches(ClassNode node) {
         int score = 0;
-        if (explicitName == null || normalize(explicitName, node).equals(node.name)) {
-            score++;
+        if (explicitName == null || normalize(explicitName, node).equals(node.name) &&
+                superClass == null || normalize(superClass, node).equals(node.superName) &&
+                subClass == null || Store.getClasses().values().stream().filter(c -> c.superName.equals(normalize(subClass, node))).anyMatch(c -> c.name.equals(node.name))) {
+            for (Map.Entry<String, Integer> entry : fieldCounts.entrySet()) {
+                if (node.fieldCount(normalize(entry.getKey(), node)) == entry.getValue())
+                    score++;
+            }
         }
-        if (superClass == null || normalize(superClass, node).equals(node.superName)) {
-            score++;
-        }
-        if (subClass == null || Store.getClasses().values().stream().filter(c -> c.superName.equals(normalize(subClass, node))).anyMatch(c -> c.name.equals(node.name))) {
-            score++;
-        }
-        for (Map.Entry<String, Integer> entry : fieldCounts.entrySet()) {
-            if (node.fieldCount(normalize(entry.getKey(), node)) == entry.getValue())
-                score++;
-        }
-        return score == (3 + fieldCounts.size());
+        return score == fieldCounts.size();
     }
 
     public boolean match(Collection<ClassNode> nodes) {

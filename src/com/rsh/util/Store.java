@@ -60,7 +60,7 @@ public class Store {
         int highest = 0;
         File jar = null;
         for (File file : new File(JAR_DIR).listFiles()) {
-            if (file.isDirectory()) continue;
+            if (file==null || file.isDirectory()) continue;
             String name = file.getName();
             if (name.endsWith(".jar")) {
                 int revision = Integer.parseInt(name.replace(".jar", ""));

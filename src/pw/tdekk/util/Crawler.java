@@ -42,7 +42,7 @@ public class Crawler {
     }
 
     private int getJarHash(String path) {
-       return getJarHash(new File(path));
+        return getJarHash(new File(path));
     }
 
     private int getJarHash(File file) {
@@ -70,12 +70,10 @@ public class Crawler {
 
     public boolean outdated() {
         int remoteHash = getRemoteHash();
-        for (File file : new File(Store.getJarDirectory()).listFiles()) {
-            if(file == null || file.isDirectory())continue;
-            int hash = getJarHash(file);
-            System.out.println(hash + " " + remoteHash);
-            if (remoteHash == hash) return false;
-        }
+        int hash = getJarHash(Store.getHighestRevision());
+        System.out.println(hash + " " + remoteHash);
+        if (remoteHash == hash) return false;
+
         return true;
     }
 

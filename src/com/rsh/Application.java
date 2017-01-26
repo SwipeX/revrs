@@ -22,6 +22,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by TimD on 1/20/2017.
@@ -39,6 +41,7 @@ public class Application {
         Store.createFiles();
 
         WebFrame frame = (WebFrame) getFrame();
+        frame.setIconImages(Arrays.asList(getIcon("burn.png").getImage(),getIcon("burn-1.png").getImage(),getIcon("burn-2.png").getImage(),getIcon("burn-3.png").getImage()));
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -128,7 +131,10 @@ public class Application {
 
         JMenuItem classIdEditor =  new JMenuItem("Class Identity Editor");
         classIdEditor.addActionListener(e -> {
-            ClassIdentity ci = new ClassIdentity("C:\\Users\\TimD\\revrs\\miu\\Node.txt");
+            ClassIdentity a = new ClassIdentity("C:\\Users\\TimD\\revrs\\miu\\Node.txt");
+            a.match(Store.getClasses().values());
+            Store.getClassIdentities().put(a.getName(),a);
+            ClassIdentity ci = new ClassIdentity("C:\\Users\\TimD\\revrs\\miu\\CacheableNode.txt");
             for(ClassNode node : Store.getClasses().values()){
                 if(ci.matches(node))
                     System.out.println(node.name + "="+ci.getIdentity());
