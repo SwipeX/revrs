@@ -1,8 +1,9 @@
-package com.rsh.tree;
+package com.rsh.ui.tree;
 
 import com.alee.extended.tree.WebAsyncTreeCellRenderer;
 import com.alee.laf.tree.WebTreeElement;
 import com.alee.laf.tree.WebTreeUI;
+import com.rsh.Application;
 import com.rsh.util.Store;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -15,6 +16,9 @@ import javax.swing.*;
  */
 
 public class PositionNodeRenderer extends WebAsyncTreeCellRenderer {
+
+    private static final ImageIcon CLASS = Application.getIcon("class.png");
+    private static final ImageIcon JAR = Application.getIcon("jar.png");
     /**
      * Returns custom tree cell renderer component
      *
@@ -41,16 +45,16 @@ public class PositionNodeRenderer extends WebAsyncTreeCellRenderer {
                 final ImageIcon icon;
                 switch (node.getType()) {
                     case JAR: {
-                        icon = WebTreeUI.ROOT_ICON;
+                        icon = JAR;
                         setText(Store.getLastVersion() + ".jar");
                         break;
                     }
                     case PARENT: {
-                        icon = expanded ? WebTreeUI.LEAF_ICON : WebTreeUI.CLOSED_ICON;
+                        icon = CLASS;//expanded ? WebTreeUI.LEAF_ICON : WebTreeUI.CLOSED_ICON;
                         break;
                     }
                     case CHILD: {
-                        icon = WebTreeUI.OPEN_ICON;
+                        icon = CLASS;
                         break;
                     }
                     default: {

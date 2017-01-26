@@ -1,4 +1,4 @@
-package com.rsh.tree;
+package com.rsh.ui.tree;
 
 import com.alee.extended.tree.AsyncUniqueNode;
 import org.objectweb.asm.tree.ClassNode;

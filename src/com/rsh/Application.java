@@ -1,28 +1,21 @@
 package com.rsh;
 
 import com.alee.extended.tree.WebAsyncTree;
-import com.alee.extended.tree.WebFileTree;
 import com.alee.laf.WebLookAndFeel;
-import com.alee.laf.desktoppane.WebDesktopPaneUI;
 import com.alee.laf.filechooser.WebFileChooser;
 import com.alee.laf.optionpane.WebOptionPane;
 import com.alee.laf.rootpane.WebFrame;
 import com.alee.laf.scroll.WebScrollPane;
-import com.alee.laf.scroll.WebScrollPaneUI;
-import com.alee.laf.tree.WebTreeUI;
-import com.rsh.tree.ASyncNodeProvider;
-import com.rsh.tree.PositionNode;
-import com.rsh.tree.PositionNodeRenderer;
+import com.rsh.ui.tree.ASyncNodeProvider;
+import com.rsh.ui.tree.PositionNode;
+import com.rsh.ui.tree.PositionNodeRenderer;
 import com.rsh.util.Store;
-import javafx.geometry.Pos;
 import pw.tdekk.deob.usage.UnusedMembers;
 import pw.tdekk.util.Archive;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
@@ -111,7 +104,6 @@ public class Application {
 
         JMenuItem hierarchy = new JMenuItem("Class Hierarchy");
         hierarchy.addActionListener(e -> {
-            //tree class diagram
             // Create data provider
             ASyncNodeProvider dataProvider = new ASyncNodeProvider();
 
@@ -120,9 +112,10 @@ public class Application {
             asyncTree.setVisibleRowCount(8);
             asyncTree.setEditable(true);
             asyncTree.setCellRenderer(new PositionNodeRenderer());
-
+            WebScrollPane webScrollPane = new WebScrollPane(asyncTree);
+            webScrollPane.getVerticalScrollBar().setUnitIncrement(35);
             // Show an example frame
-            frame.getContentPane().add(new WebScrollPane(asyncTree));
+            frame.getContentPane().add(webScrollPane);
             frame.setVisible(true);
         });
         view.add(hierarchy);
@@ -137,5 +130,9 @@ public class Application {
 
     public static JFrame getFrame() {
         return frame != null ? frame : (frame = new WebFrame(NAME));
+    }
+
+    public static ImageIcon getIcon(String name) {
+        return new ImageIcon(Application.class.getResource("ui/icon/" + name));
     }
 }
