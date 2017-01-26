@@ -13,7 +13,7 @@ public class CSVWriter {
     public static void WriteMap(String path, HashMap<String, String> map) {
         try {
             PrintWriter writer = new PrintWriter(path);
-            map.entrySet().forEach(entry -> writer.write(entry.getKey() + "," + entry.getValue() + "\n"));
+            map.entrySet().forEach(entry -> writer.write(entry.getKey() + "," + entry.getValue() + "\r\n"));
             writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

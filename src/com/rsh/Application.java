@@ -6,16 +6,21 @@ import com.alee.laf.filechooser.WebFileChooser;
 import com.alee.laf.optionpane.WebOptionPane;
 import com.alee.laf.rootpane.WebFrame;
 import com.alee.laf.scroll.WebScrollPane;
+import com.rsh.miu.ClassIdentity;
+import com.rsh.ui.ClassIdentityEditor;
 import com.rsh.ui.tree.ASyncNodeProvider;
 import com.rsh.ui.tree.PositionNode;
 import com.rsh.ui.tree.PositionNodeRenderer;
 import com.rsh.util.Store;
+import org.objectweb.asm.tree.ClassNode;
 import pw.tdekk.deob.usage.UnusedMembers;
 import pw.tdekk.util.Archive;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
@@ -115,10 +120,23 @@ public class Application {
             WebScrollPane webScrollPane = new WebScrollPane(asyncTree);
             webScrollPane.getVerticalScrollBar().setUnitIncrement(35);
             // Show an example frame
+            frame.getContentPane().removeAll();
             frame.getContentPane().add(webScrollPane);
             frame.setVisible(true);
         });
         view.add(hierarchy);
+
+        JMenuItem classIdEditor =  new JMenuItem("Class Identity Editor");
+        classIdEditor.addActionListener(e -> {
+            ClassIdentity ci = new ClassIdentity("C:\\Users\\TimD\\revrs\\miu\\Node.txt");
+            for(ClassNode node : Store.getClasses().values()){
+                if(ci.matches(node))
+                    System.out.println(node.name + "="+ci.getIdentity());
+            }
+            frame.getContentPane().removeAll();
+            frame.getContentPane().add(new ClassIdentityEditor());
+        });
+        view.add(classIdEditor);
 
         frame.setLayout(new BorderLayout());
         frame.add(menuBar, BorderLayout.NORTH);

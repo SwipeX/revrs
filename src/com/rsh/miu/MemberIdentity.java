@@ -7,12 +7,20 @@ package com.rsh.miu;
  * Each member also has an identity, which is what it is called across all revisions.
  */
 public abstract class MemberIdentity {
-    private String name;
-    private String identity;
+    protected String name;
+    protected String identity;
 
     public boolean isIdentified() {
-        return identity != null;
+        return name != null;
     }
 
-    //I need some way to read/save parameters to conjugate a validate method.
+    public String getName() {
+        return name;
+    }
+
+    public String getIdentity() {
+        return identity;
+    }
+
+//I need some way to read/save parameters to conjugate a validate method.
 }

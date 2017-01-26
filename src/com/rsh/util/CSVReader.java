@@ -1,5 +1,6 @@
 package com.rsh.util;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.Scanner;
@@ -10,14 +11,16 @@ import java.util.Scanner;
 public class CSVReader {
 
     public static HashMap<String, String> readAsMap(String path) {
-        Scanner scanner = new Scanner(path);
         HashMap<String, String> map = new HashMap<>();
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            String[] split = line.split(",");
-            map.put(split[0], split[1]);
+        try (Scanner scanner = new Scanner(new File(path))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] split = line.split(",");
+                map.put(split[0].trim(), split[1].trim());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        scanner.close();
         return map;
     }
 }
