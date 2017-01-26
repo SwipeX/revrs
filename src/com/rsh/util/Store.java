@@ -1,6 +1,7 @@
 package com.rsh.util;
 
 import com.rsh.Application;
+import com.rsh.miu.ClassIdentity;
 import org.objectweb.asm.tree.ClassNode;
 import pw.tdekk.VersionVisitor;
 import pw.tdekk.util.Archive;
@@ -18,6 +19,7 @@ import java.util.jar.JarFile;
  */
 public class Store {
     private static ConcurrentHashMap<String, ClassNode> classes = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, ClassIdentity> classIdentities = new ConcurrentHashMap<>();
     private static final String HOME_DIR = System.getProperty("user.home") + File.separator + "revrs";
     private static final String MIU_DIR = HOME_DIR + File.separator + "miu";
     private static final String JAR_DIR = HOME_DIR + File.separator + "jars";
@@ -40,6 +42,10 @@ public class Store {
 
     public static ConcurrentHashMap<String, ClassNode> getClasses() {
         return classes;
+    }
+
+    public static ConcurrentHashMap<String, ClassIdentity> getClassIdentities() {
+        return classIdentities;
     }
 
     public static void loadClasses(String filename) {

@@ -5,9 +5,11 @@ import com.rsh.util.Store;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +35,7 @@ public class ClassIdentity extends MemberIdentity {
     private String normalize(String var, ClassNode node) {
         if (var.startsWith("#")) {
             var = var.replace("#", "");
-            int depth = var.length() - var.replace("[", "").length();
+            int depth = var.length() - (var = var.replace("[", "")).length();
             switch (var) {
                 case "self":
                     return node.name;
@@ -42,8 +44,27 @@ public class ClassIdentity extends MemberIdentity {
                 case "super":
                     return node.superName;
             }
+            boolean def = false;
+            if (var.startsWith("def")) {
+                var = var.replace("def", "");
+                def = true;
+            }
+            if ((var = getIdentityValue(var)) != null) {
+                return arrayPrefix(depth) + (def ? "L" + var + ";" : var);
+            }
         }
         return var;
+    }
+
+    private String getIdentityValue(String name) {
+        ConcurrentHashMap<String, ClassIdentity> identityMap = Store.getClassIdentities();
+        if (identityMap.containsKey(name)) {
+            ClassIdentity identity = identityMap.get(name);
+            if (identity != null && identity.isIdentified()) {
+                return identity.getName();
+            }
+        }
+        return null;
     }
 
     private String arrayPrefix(int depth) {
@@ -53,6 +74,12 @@ public class ClassIdentity extends MemberIdentity {
         return prefix;
     }
 
+    /**
+     * @param node a ClassNode object to check against
+     * @return true if the node scores a perfect score.
+     * <p>
+     * Honestly this is fine, but it has repetitive code and probably could get better.
+     */
     public boolean matches(ClassNode node) {
         int score = 0;
         if (explicitName == null || normalize(explicitName, node).equals(node.name)) {
@@ -71,7 +98,19 @@ public class ClassIdentity extends MemberIdentity {
         return score == (3 + fieldCounts.size());
     }
 
-    public void onIdentify(ClassNode node) {
+    public boolean match(Collection<ClassNode> nodes) {
+        Collection<ClassNode> matchedNodes = nodes.stream().filter(this::matches).collect(Collectors.toCollection(ArrayList::new));
+        if (matchedNodes.size() > 1) {
+            //more than one match...lets decide what to do later
+            return false;
+        } else {
+            //there is only one...this is the best one liner...
+            matchedNodes.forEach(this::onIdentify);
+            return true;
+        }
+    }
+
+    private void onIdentify(ClassNode node) {
         name = node.name;
     }
 
@@ -81,7 +120,7 @@ public class ClassIdentity extends MemberIdentity {
         return "explicitName: " + explicitName + "\nsuperClass: " + superClass + "\nsubClass: " + subClass + "\nfieldCounts: \n" + fields;
     }
 
-    public HashMap<String, String> getOutputMap() {
+    private HashMap<String, String> getOutputMap() {
         HashMap<String, String> output = new HashMap<>();
         fieldCounts.entrySet().forEach(e -> output.put(e.getKey(), e.getValue() + ""));
         output.put("superClass", subClass);
