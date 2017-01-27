@@ -4,6 +4,7 @@ import com.alee.extended.tree.WebAsyncTree;
 import com.alee.laf.WebLookAndFeel;
 import com.alee.laf.filechooser.WebFileChooser;
 import com.alee.laf.optionpane.WebOptionPane;
+import com.alee.laf.panel.WebPanel;
 import com.alee.laf.rootpane.WebFrame;
 import com.alee.laf.scroll.WebScrollPane;
 import com.rsh.miu.ClassIdentity;
@@ -19,10 +20,7 @@ import pw.tdekk.util.Archive;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -31,6 +29,7 @@ import java.util.Arrays;
 public class Application {
 
     private static JFrame frame;
+    private static WebPanel panel = new WebPanel();
     private static final String NAME = "revrs";
 
     public static void main(String[] args) {
@@ -41,11 +40,11 @@ public class Application {
         Store.createFiles();
 
         WebFrame frame = (WebFrame) getFrame();
-        frame.setIconImages(Arrays.asList(getIcon("burn.png").getImage(),getIcon("burn-1.png").getImage(),getIcon("burn-2.png").getImage(),getIcon("burn-3.png").getImage()));
+        frame.setIconImages(Arrays.asList(getIcon("burn.png").getImage(), getIcon("burn-1.png").getImage(), getIcon("burn-2.png").getImage(), getIcon("burn-3.png").getImage()));
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
         addMenuItems(frame);
+        frame.getContentPane().add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
         if (Store.getCrawler().outdated()) {
             int result = WebOptionPane.showConfirmDialog(frame, "Would you like to update", "Outdated!", WebOptionPane.YES_NO_OPTION);
@@ -129,27 +128,24 @@ public class Application {
         });
         view.add(hierarchy);
 
-        JMenuItem classIdEditor =  new JMenuItem("Class Identity Editor");
+        JMenuItem classIdEditor = new JMenuItem("Class Identity Editor");
         classIdEditor.addActionListener(e -> {
-            ClassIdentity a = new ClassIdentity("C:\\Users\\TimD\\revrs\\miu\\Node.txt");
-            a.match(Store.getClasses().values());
-            Store.getClassIdentities().put(a.getName(),a);
-            ClassIdentity ci = new ClassIdentity("C:\\Users\\TimD\\revrs\\miu\\CacheableNode.txt");
-            for(ClassNode node : Store.getClasses().values()){
-                if(ci.matches(node))
-                    System.out.println(node.name + "="+ci.getIdentity());
-            }
-            frame.getContentPane().removeAll();
-            frame.getContentPane().add(new ClassIdentityEditor());
+            panel.removeAll();
+            panel.add(new ClassIdentityEditor(),BorderLayout.CENTER);
+            frame.setVisible(true);
         });
         view.add(classIdEditor);
 
         frame.setLayout(new BorderLayout());
-        frame.add(menuBar, BorderLayout.NORTH);
+        frame.setJMenuBar(menuBar);
     }
 
     public static void infoBox(String infoMessage, String titleBar) {
         JOptionPane.showMessageDialog(getFrame(), infoMessage, "Message: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static WebPanel getPanel() {
+        return panel;
     }
 
     public static JFrame getFrame() {

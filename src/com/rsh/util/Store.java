@@ -1,16 +1,21 @@
 package com.rsh.util;
 
+import com.alee.laf.panel.WebPanel;
 import com.rsh.Application;
 import com.rsh.miu.ClassIdentity;
+import com.rsh.ui.DownloadProgress;
 import org.objectweb.asm.tree.ClassNode;
 import pw.tdekk.VersionVisitor;
+import pw.tdekk.test.App;
 import pw.tdekk.util.Archive;
 import pw.tdekk.util.Crawler;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 
@@ -48,6 +53,10 @@ public class Store {
         return classIdentities;
     }
 
+    static {
+        loadIdentifiers();
+    }
+
     public static void loadClasses(String filename) {
         try {
             loadClasses(new JarFile(filename, false));
@@ -56,11 +65,21 @@ public class Store {
         }
     }
 
+    public static void loadIdentifiers() {
+        File[] files = new File(getMiuDirectory()).listFiles();
+        if (files != null) {
+            for (File file : files) {
+                ClassIdentity identity = new ClassIdentity(file.getAbsolutePath());
+                classIdentities.put(identity.getIdentity(), identity);
+            }
+        }
+    }
+
     public static File getHighestRevision() {
         int highest = 0;
         File jar = null;
         for (File file : new File(JAR_DIR).listFiles()) {
-            if (file==null || file.isDirectory()) continue;
+            if (file == null || file.isDirectory()) continue;
             String name = file.getName();
             if (name.endsWith(".jar")) {
                 int revision = Integer.parseInt(name.replace(".jar", ""));
@@ -82,7 +101,8 @@ public class Store {
             lastVersion = version;
             File dest = new File(JAR_DIR + File.separator + version + ".jar");
             if (!dest.exists()) {
-                Archive.write(dest, classes);
+                //have to use file copy due to the resources not being verified, which means not loaded.
+                Files.copy(new File(file.getName()).toPath(), dest.toPath());
             }
             Application.getFrame().setTitle("revrs - OSRS #" + version);
         } catch (Exception e) {
@@ -95,8 +115,13 @@ public class Store {
         new Thread(() -> {
             try {
                 if (crawler.outdated()) {
+                    WebPanel panel = Application.getPanel();
+                    panel.removeAll();
+                    panel.add(new DownloadProgress(), BorderLayout.SOUTH);
+                    Application.getFrame().setVisible(true);
                     crawler.download();
-                    Application.infoBox("Jar updated!", "Done");
+                    panel.removeAll();
+                    Application.infoBox("Updated", "Updated");
                     loadClasses(HOME_DIR + File.separator + "os_pack.jar");
                 } else {
                     Application.infoBox("Already up to date!", "Connection");
@@ -113,6 +138,10 @@ public class Store {
 
     public static String getJarDirectory() {
         return JAR_DIR;
+    }
+
+    public static String getMiuDirectory() {
+        return MIU_DIR;
     }
 
     public static String getDeobDirectory() {

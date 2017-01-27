@@ -33,7 +33,7 @@ public class ClassIdentity extends MemberIdentity {
     }
 
     private String normalize(String var, ClassNode node) {
-        if (var.startsWith("#")) {
+        if (var != null && var.startsWith("#")) {
             var = var.replace("#", "");
             int depth = var.length() - (var = var.replace("[", "")).length();
             switch (var) {
@@ -77,16 +77,21 @@ public class ClassIdentity extends MemberIdentity {
     /**
      * @param node a ClassNode object to check against
      * @return true if the node scores a perfect score.
-     *
      */
     public boolean matches(ClassNode node) {
+        if (node == null) return false;
+        String eName = normalize(explicitName, node);
+        String cSuper = normalize(superClass, node);
+        String cSub = normalize(subClass, node);
         int score = 0;
-        if (explicitName == null || normalize(explicitName, node).equals(node.name) &&
-                superClass == null || normalize(superClass, node).equals(node.superName) &&
-                subClass == null || Store.getClasses().values().stream().filter(c -> c.superName.equals(normalize(subClass, node))).anyMatch(c -> c.name.equals(node.name))) {
-            for (Map.Entry<String, Integer> entry : fieldCounts.entrySet()) {
-                if (node.fieldCount(normalize(entry.getKey(), node)) == entry.getValue())
-                    score++;
+        if (eName == null || eName.equals(node.name)) {
+            if (cSuper == null || cSuper.equals(node.superName)) {
+                if (cSub == null || Store.getClasses().values().stream().filter(c -> c.superName.equals(cSub)).anyMatch(c -> c.name.equals(node.name))) {
+                    for (Map.Entry<String, Integer> entry : fieldCounts.entrySet()) {
+                        if (node.fieldCount(normalize(entry.getKey(), node)) == entry.getValue())
+                            score++;
+                    }
+                }
             }
         }
         return score == fieldCounts.size();
@@ -121,5 +126,33 @@ public class ClassIdentity extends MemberIdentity {
         output.put("subClass", subClass);
         output.put("explicitName", explicitName);
         return output;
+    }
+
+    public Map<String, Integer> getFieldCounts() {
+        return fieldCounts;
+    }
+
+    public String getSuperClass() {
+        return superClass;
+    }
+
+    public void setSuperClass(String superClass) {
+        this.superClass = superClass;
+    }
+
+    public String getSubClass() {
+        return subClass;
+    }
+
+    public void setSubClass(String subClass) {
+        this.subClass = subClass;
+    }
+
+    public String getExplicitName() {
+        return explicitName;
+    }
+
+    public void setExplicitName(String explicitName) {
+        this.explicitName = explicitName;
     }
 }

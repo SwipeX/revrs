@@ -17,6 +17,8 @@ import java.util.jar.Manifest;
 public class Crawler {
 
     private final Map<String, String> parameters = new HashMap<>();
+    protected static int prevFileSize = 0;
+    protected static int currSize = 0;
 
     private static final int[] WORLDS = {
             1, 2, 5, 6, 9, 10, 13, 14, 17, 21, 22, 26, 29, 30, 33, 34, 38,
@@ -48,7 +50,8 @@ public class Crawler {
     private int getJarHash(File file) {
         try {
             JarFile jarFile = new JarFile(file);
-            return jarFile.getManifest().hashCode();
+            Manifest manifest = jarFile.getManifest();
+            return manifest != null ? manifest.hashCode() : -1;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -108,5 +111,10 @@ public class Crawler {
     public Dimension getAppletSize() {
         return new Dimension(Integer.parseInt(parameters.get("applet_minwidth")),
                 Integer.parseInt(parameters.get("applet_minheight")));
+    }
+
+    public static int getDownloadPercent() {
+        if (prevFileSize == 0) return 0;
+        return (int) ((double) currSize / prevFileSize * 100);
     }
 }

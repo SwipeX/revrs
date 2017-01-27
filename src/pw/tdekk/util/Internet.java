@@ -8,7 +8,7 @@ import java.util.List;
 
 class Internet {
 
-    private static final int BUFFER_SIZE = 8192;
+    private static final int BUFFER_SIZE = 2048;
 
     private static final String DEFAULT_USER_AGENT;
 
@@ -68,6 +68,7 @@ class Internet {
             byte[] buf = new byte[BUFFER_SIZE];
             int n;
             while ((n = in.read(buf, 0, BUFFER_SIZE)) > 0) {
+                Crawler.currSize += BUFFER_SIZE;
                 out.write(buf, 0, n);
             }
             return out.toByteArray();
@@ -78,9 +79,8 @@ class Internet {
         try {
             URL url = new URL(site);
             URLConnection connection = url.openConnection();
-            if (true) {
-                connection = mask(connection);
-            }
+            connection = mask(connection);
+            Crawler.prevFileSize = connection.getContentLength();
             try (InputStream stream = connection.getInputStream()) {
                 File file = new File(target);
                 try (FileOutputStream out = new FileOutputStream(file)) {
@@ -92,4 +92,6 @@ class Internet {
             return null;
         }
     }
+
+
 }
